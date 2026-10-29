@@ -1,0 +1,84 @@
+# Shared triage for every lepetitatelier repo. Each repo calls it from .github/workflows/community.yml.
+# - Makes sure the shared labels (labels.tsv) exist in the repo.
+# - New issue: type label from the title if the form didn't set one, needs-triage, and `safety` if it sounds like
+#   someone could get hurt.
+# - New pull request: labels from the files it touches (hardware, firmware, software, documentation).
+# - First issue or pull request from someone outside the team: a short welcome.
+# Never checks out or runs code from a pull request, so it is safe on pull_request_target.
+name: Triage
+on:
+  workflow_call:
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    if: github.actor != 'dependabot[bot]'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: lepetitatelier/.github
+          sparse-checkout: labels.tsv
+          sparse-checkout-cone-mode: false
+          path: _lpa
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            const p = context.payload;
+            const item = p.issue || p.pull_request;
+            const isPR = !!p.pull_request;
+            if (!item) return;
+
+            // 1. Shared labels
+            const wanted = fs.readFileSync('_lpa/labels.tsv', 'utf8').trim().split('\n').map(l => l.split('\t'));
+            const have = new Set((await github.paginate(github.rest.issues.listLabelsForRepo, { owner, repo, per_page: 100 }))
+              .map(l => l.name.toLowerCase()));
+            for (const [name, color, description] of wanted) {
+              if (!have.has(name.toLowerCase())) {
+                await github.rest.issues.createLabel({ owner, repo, name, color, description }).catch(() => {});
+              }
+            }
+
+            // 2. Labels for this issue or pull request
+            const current = new Set((item.labels || []).map(l => l.name));
+            const add = new Set();
+            const text = `${item.title}\n${item.body || ''}`;
+            if (!isPR) {
+              const t = item.title.toLowerCase();
+              const types = { 'bug:': 'bug', 'idea:': 'idea', 'build:': 'build-report', 'question:': 'question' };
+              for (const [prefix, label] of Object.entries(types)) if (t.startsWith(prefix)) add.add(label);
+              if (!current.has('build-report') && !add.has('build-report')) add.add('needs-triage');
+            } else {
+              const files = await github.paginate(github.rest.pulls.listFiles, { owner, repo, pull_number: item.number, per_page: 100 });
+              const kinds = {
+                hardware: /\.(stl|step|stp|3mf|scad|fcstd|f3d|f3z|dxf|svg|kicad_\w+|gbr|drl|obj|blend)$/i,
+                firmware: /(\.(ino|c|cpp|h|hpp)$|platformio\.ini$)/i,
+                software: /\.(py|rs|ts|tsx|js|mjs|astro|sh|toml|ya?ml|json|lock|dockerfile)$|(^|\/)Dockerfile$/i,
+                documentation: /\.(md|txt|pdf|png|jpe?g|webp|gif|mp4|mov)$/i,
+              };
+              for (const f of files) for (const [label, re] of Object.entries(kinds)) if (re.test(f.filename)) add.add(label);
+            }
+            const danger = /\b(burn(s|t|ed|ing)?|fire|flames?|smok(e|ing)|fumes?|toxic|poison|shock(ed)?|electrocut\w*|injur\w*|hurt|bleed\w*|overheat\w*|explo\w+|melted wire|short circuit)\b/i;
+            if (danger.test(text)) { add.add('safety'); if (!isPR) add.add('needs-triage'); }
+            const labels = [...add].filter(l => !current.has(l));
+            if (labels.length) await github.rest.issues.addLabels({ owner, repo, issue_number: item.number, labels });
+
+            // 3. Welcome people from outside the team, once
+            const outsider = ['FIRST_TIMER', 'FIRST_TIME_CONTRIBUTOR', 'NONE'].includes(item.author_association);
+            if (outsider && item.user.type !== 'Bot') {
+              const site = 'https://lepetitatelier.nz';
+              let body = isPR
+                ? `Kia ora @${item.user.login}, and thank you for your first pull request here!\n\n` +
+                  `We're a small open workshop in Akaroa, New Zealand, so a person will look at it, usually within a week. ` +
+                  `The automatic checks below look for big files outside Git LFS and broken links; if one fails, its message says how to fix it.`
+                : `Kia ora @${item.user.login}, and thank you for writing!\n\n` +
+                  `We're a small open workshop in Akaroa, New Zealand: a person reads every issue, usually within a week. ` +
+                  `Photos, sketches and links to files help a lot.`;
+              if (add.has('safety')) body += `\n\nThis looks like it could be about safety, so it's marked to be looked at first. If someone is in danger right now, stop using the machine and unplug it.`;
+              body += `\n\n— [Le Petit Atelier](${site})`;
+              await github.rest.issues.createComment({ owner, repo, issue_number: item.number, body });
+            }

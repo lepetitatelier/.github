@@ -18,3 +18,8 @@ recycling, repair) built for the local environment and community, with every des
 
 One repo per project, each with its files, build notes and history. Projects are described on
 [lepetitatelier.nz/projects](https://lepetitatelier.nz/projects/). Designs are published here as each project is ready.
+
+## Take part
+
+Built one of our projects? Found a problem? Have an idea? Open an issue in the project's repo: there's a form for
+each. Pull requests welcome: see [how to contribute](https://github.com/lepetitatelier/.github/blob/main/CONTRIBUTING.md).

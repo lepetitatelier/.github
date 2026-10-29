@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Write to us
+    url: https://lepetitatelier.nz/get-involved/#contact
+    about: Workshops, visits, donations of plastic or tools, anything that isn't about a specific project.
+  - name: All our projects
+    url: https://lepetitatelier.nz/projects/
+    about: Find the right project before opening an issue.
+  - name: Report a security problem
+    url: https://github.com/lepetitatelier/.github/blob/main/SECURITY.md
+    about: Please don't open a public issue for security problems.

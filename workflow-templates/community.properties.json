@@ -1,0 +1,6 @@
+{
+  "name": "Le Petit Atelier community",
+  "description": "Triage new issues and pull requests, check pull requests for big files outside Git LFS and broken links.",
+  "iconName": "octicon people",
+  "categories": ["Automation"]
+}

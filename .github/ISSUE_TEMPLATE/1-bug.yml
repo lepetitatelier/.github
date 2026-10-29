@@ -1,0 +1,33 @@
+name: Something is wrong
+description: A part does not fit, a step is missing, a file will not open, the instructions are unclear.
+title: "Bug: "
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Plain words are fine. **If someone could get hurt** (burns, fumes, electrics, moving parts), say so
+        in the first line: those reports are looked at first.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, what you got instead.
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Which file or step?
+      description: A path, a link, or the step number in the build guide.
+      placeholder: e.g. mods/hopper/hopper_v2.step, or "build guide step 4"
+  - type: textarea
+    id: setup
+    attributes:
+      label: Your setup
+      description: "Printer, slicer, material, machine, software version: whatever applies."
+  - type: textarea
+    id: photos
+    attributes:
+      label: Photos or files
+      description: Drag photos, screenshots or files here. Please don't include people without their consent.

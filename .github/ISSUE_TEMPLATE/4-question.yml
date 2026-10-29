@@ -1,0 +1,15 @@
+name: A question
+description: Something you'd like to know about this project.
+title: "Question: "
+labels: [question]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: What you've tried or read so far

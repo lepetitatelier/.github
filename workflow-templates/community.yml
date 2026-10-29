@@ -1,0 +1,23 @@
+# Community automation, shared by every lepetitatelier repo (logic lives in lepetitatelier/.github):
+# triage of new issues and pull requests, and checks on pull requests (Git LFS for big files, broken links).
+name: Community
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened, reopened]
+  pull_request:
+permissions: {}
+jobs:
+  triage:
+    if: github.event_name != 'pull_request'
+    uses: lepetitatelier/.github/.github/workflows/triage.yml@main
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+  checks:
+    if: github.event_name == 'pull_request'
+    uses: lepetitatelier/.github/.github/workflows/pr-checks.yml@main
+    permissions:
+      contents: read

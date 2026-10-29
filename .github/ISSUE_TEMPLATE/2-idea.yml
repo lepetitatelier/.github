@@ -1,0 +1,25 @@
+name: An idea
+description: A new project, an improvement, a better way to do something.
+title: "Idea: "
+labels: [idea, needs-triage]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: What would you make or change, and what would it make better?
+    validations:
+      required: true
+  - type: textarea
+    id: how
+    attributes:
+      label: How it could work
+      description: Sketches, links, parts, materials. Rough is fine.
+  - type: dropdown
+    id: help
+    attributes:
+      label: Would you like to help make it?
+      options:
+        - "Yes, I'd like to work on it"
+        - Maybe, with some guidance
+        - No, just sharing the idea

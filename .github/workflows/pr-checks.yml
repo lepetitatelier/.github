@@ -1,0 +1,24 @@
+# Shared pull request checks for every lepetitatelier repo (tools/pr_checks.py): big files must go through Git LFS,
+# relative Markdown links must point to files that exist. Called from each repo's .github/workflows/community.yml.
+name: PR checks
+on:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  files-and-links:
+    name: Files and links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: false
+      - uses: actions/checkout@v4
+        with:
+          repository: lepetitatelier/.github
+          sparse-checkout: tools/pr_checks.py
+          sparse-checkout-cone-mode: false
+          path: .lpa-checks
+      - name: Check
+        run: python3 .lpa-checks/tools/pr_checks.py "origin/${{ github.base_ref || 'main' }}"

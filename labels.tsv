@@ -1,0 +1,13 @@
+bug	d73a4a	Something is broken, wrong or unclear in a design, build or document
+idea	a2eeef	A new project, feature or improvement
+build-report	0e8a16	Someone built, printed or made this: photos, notes, changes
+question	d876e3	A question about a project
+safety	b60205	Burns, fumes, electrics, moving parts, sharp edges: looked at first
+needs-triage	fbca04	New: not looked at yet
+documentation	0075ca	Words, photos and instructions
+hardware	5319e7	CAD, printed parts, PCBs, plans
+firmware	1d76db	Code that runs on a microcontroller
+software	006b75	Scripts, tools, apps, the website
+dependencies	0366d6	Library and tool updates (Dependabot)
+good first issue	7057ff	A good place to start
+help wanted	008672	We would love a hand with this
