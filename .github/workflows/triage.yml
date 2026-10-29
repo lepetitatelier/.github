@@ -68,7 +68,14 @@ jobs:
             if (labels.length) await github.rest.issues.addLabels({ owner, repo, issue_number: item.number, labels });
 
             // 3. Welcome people from outside the team, once
-            const outsider = ['FIRST_TIMER', 'FIRST_TIME_CONTRIBUTOR', 'NONE'].includes(item.author_association);
+            // author_association says NONE for team members whose org membership is private, so also ask for
+            // their permission on this repo: anyone who can write here is team.
+            let outsider = ['FIRST_TIMER', 'FIRST_TIME_CONTRIBUTOR', 'NONE'].includes(item.author_association);
+            if (outsider) {
+              const perm = await github.rest.repos.getCollaboratorPermissionLevel({ owner, repo, username: item.user.login })
+                .then(r => r.data.permission).catch(() => 'none');
+              if (['admin', 'maintain', 'write'].includes(perm)) outsider = false;
+            }
             if (outsider && item.user.type !== 'Bot') {
               const site = 'https://lepetitatelier.nz';
               let body = isPR
