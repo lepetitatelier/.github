@@ -10,11 +10,11 @@ jobs:
     name: Files and links
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           lfs: false
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: lepetitatelier/.github
           sparse-checkout: tools/pr_checks.py
