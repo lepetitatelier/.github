@@ -1,0 +1,11 @@
+# Keeps the shared workflows' actions up to date (monthly, one grouped pull request).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    labels: [dependencies]
+    groups:
+      actions:
+        patterns: ["*"]
